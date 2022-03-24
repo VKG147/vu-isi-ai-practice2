@@ -4,35 +4,37 @@ using System.Linq;
 
 namespace AI.Practice2
 {
-    public static class DataProcessor
+    public class DataProcessor
     {
-        private static readonly Random random = new();
+        private readonly Random _random;
+
+        public DataProcessor() { _random = new(); }
+        public DataProcessor(Random random) { _random = random; }
 
         /// <summary>
         /// Splits the provided neuron data into two groups based on the splitRatio
         /// </summary>
         /// <param name="splitRatio">Value from 0 to 1, the ratio of elements in the first group</param>
         /// <returns>Two lists of neuron data</returns>
-        public static Tuple<List<float[]>, List<float[]>> SplitData(List<float[]> data, decimal splitRatio)
+        public (List<float[]> trainingData, List<float[]> testingData) SplitData(List<float[]> data, decimal splitRatio)
         {
-            data.Shuffle();
+            data.Shuffle(_random);
             int groupOneCount = (int)(splitRatio * data.Count);
             List<float[]> groupOne = data.GetRange(0, groupOneCount).ToList();
             List<float[]> groupTwo = data.GetRange(groupOne.Count, data.Count - groupOneCount);
             return new(groupOne, groupTwo);
         }
 
-        private static void Shuffle<T>(this IList<T> list)
+        public static List<float[]> PrependBiasInputs(List<float[]> data)
         {
-            int n = list.Count;
-            while (n > 1)
+            for (int i = 0; i < data.Count; ++i)
             {
-                n--;
-                int k = random.Next(n + 1);
-                T value = list[k];
-                list[k] = list[n];
-                list[n] = value;
+                float[] inputs = new float[data[i].Length + 1];
+                inputs[0] = 1;
+                Array.Copy(data[i], 0, inputs, 1, data[i].Length);
+                data[i] = inputs;
             }
+            return data;
         }
     }
 }

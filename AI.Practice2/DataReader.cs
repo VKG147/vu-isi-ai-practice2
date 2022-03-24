@@ -33,7 +33,6 @@ namespace AI.Practice2
             return data;
         }
 
-
         public void Dispose()
         {
             _fileReader.Dispose();
